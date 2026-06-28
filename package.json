@@ -7,7 +7,7 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "prepare": "vp config"
+    "prepare": "node -e \"if(!process.env.CI)require('child_process').execSync('vp config',{stdio:'inherit'})\""
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
