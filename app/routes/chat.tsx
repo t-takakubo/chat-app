@@ -1,5 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
+import { Avatar, AvatarBadge, AvatarFallback } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { ScrollArea } from "~/components/ui/scroll-area";
 
 const rooms = [
@@ -62,20 +66,36 @@ const gradients = [
   "from-cyan-400 to-sky-500",
 ];
 
+const chatTheme = {
+  "--background": "oklch(0.09 0.008 60)",
+  "--foreground": "oklch(0.92 0.018 70)",
+  "--card": "oklch(0.13 0.008 60)",
+  "--card-foreground": "oklch(0.92 0.018 70)",
+  "--popover": "oklch(0.13 0.008 60)",
+  "--popover-foreground": "oklch(0.92 0.018 70)",
+  "--primary": "oklch(0.73 0.11 70)",
+  "--primary-foreground": "oklch(0.08 0 0)",
+  "--secondary": "oklch(0.15 0.006 60)",
+  "--secondary-foreground": "oklch(0.88 0.015 70)",
+  "--muted": "oklch(0.15 0.006 60)",
+  "--muted-foreground": "oklch(0.45 0.015 68)",
+  "--accent": "oklch(0.18 0.007 60)",
+  "--accent-foreground": "oklch(0.92 0.018 70)",
+  "--border": "oklch(1 0 0 / 0.06)",
+  "--input": "oklch(1 0 0 / 0.08)",
+  "--ring": "oklch(0.73 0.11 70)",
+  "--radius": "0.75rem",
+  background: "oklch(0.09 0.008 60)",
+  color: "oklch(0.92 0.018 70)",
+  fontFamily: "'Geist Variable', sans-serif",
+} as React.CSSProperties;
+
 export default function Chat() {
   const [search, setSearch] = useState("");
-  const [hovered, setHovered] = useState<string | null>(null);
   const filtered = rooms.filter((r) => r.name.includes(search) || r.lastMessage.includes(search));
 
   return (
-    <div
-      className="flex flex-col h-screen"
-      style={{
-        background: "#0d0c0a",
-        color: "#f0ead8",
-        fontFamily: "'Geist Variable', sans-serif",
-      }}
-    >
+    <div className="flex flex-col h-screen" style={chatTheme}>
       {/* Header */}
       <div
         className="px-6 pt-8 pb-5 flex-shrink-0"
@@ -85,20 +105,21 @@ export default function Chat() {
           <div>
             <h1
               className="text-[1.75rem] font-semibold tracking-[-0.03em] leading-none"
-              style={{ color: "#f0ead8" }}
+              style={{ color: "oklch(0.92 0.018 70)" }}
             >
               メッセージ
             </h1>
             <p
               className="text-xs mt-2 font-medium tracking-wide uppercase"
-              style={{ color: "#4a4540", letterSpacing: "0.08em" }}
+              style={{ color: "oklch(0.38 0.008 60)", letterSpacing: "0.08em" }}
             >
               {rooms.length} チャンネル
             </p>
           </div>
-          <button
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 active:scale-95"
-            style={{ background: "rgba(212,168,67,0.12)", color: "#d4a843" }}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-xl bg-primary/10 text-primary hover:bg-white/5"
           >
             <svg
               width="16"
@@ -110,13 +131,13 @@ export default function Chat() {
             >
               <path d="M12 5v14M5 12h14" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div className="relative">
           <svg
             className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
-            style={{ color: "#4a4540" }}
+            style={{ color: "oklch(0.38 0.008 60)" }}
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -125,16 +146,11 @@ export default function Chat() {
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" />
           </svg>
-          <input
+          <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="検索..."
-            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl outline-none transition-all duration-200"
-            style={{
-              background: "rgba(240,234,216,0.04)",
-              border: "1px solid rgba(240,234,216,0.07)",
-              color: "#f0ead8",
-            }}
+            className="pl-10"
           />
         </div>
       </div>
@@ -143,7 +159,7 @@ export default function Chat() {
       <ScrollArea className="flex-1">
         <div className="py-3">
           {filtered.length === 0 && (
-            <p className="text-center py-12 text-sm" style={{ color: "#4a4540" }}>
+            <p className="text-center py-12 text-sm" style={{ color: "oklch(0.38 0.008 60)" }}>
               見つかりませんでした
             </p>
           )}
@@ -151,62 +167,54 @@ export default function Chat() {
             <Link
               key={room.id}
               to={`/chat/${room.id}`}
-              onMouseEnter={() => setHovered(room.id)}
-              onMouseLeave={() => setHovered(null)}
-              className="flex items-center gap-4 px-6 py-3.5 transition-all duration-150 relative"
-              style={{
-                background: hovered === room.id ? "rgba(240,234,216,0.04)" : "transparent",
-              }}
+              className="flex items-center gap-4 px-6 py-3.5 transition-all duration-150 relative hover:bg-white/5"
             >
               {/* Unread indicator line */}
               {room.unread > 0 && (
                 <div
                   className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-r-full"
-                  style={{ background: "#d4a843" }}
+                  style={{ background: "oklch(0.73 0.11 70)" }}
                 />
               )}
 
-              <div className="relative flex-shrink-0">
-                <div
-                  className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradients[i % gradients.length]} flex items-center justify-center text-white font-bold text-base shadow-lg`}
+              <Avatar className="w-12 h-12 rounded-2xl after:rounded-2xl flex-shrink-0">
+                <AvatarFallback
+                  className={`bg-gradient-to-br ${gradients[i % gradients.length]} text-white font-bold text-base rounded-2xl`}
                 >
                   {room.name[0]}
-                </div>
-                <div
-                  className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2"
-                  style={{
-                    background: i % 3 === 2 ? "#6b7280" : "#22c55e",
-                    borderColor: "#0d0c0a",
-                  }}
-                />
-              </div>
+                </AvatarFallback>
+                <AvatarBadge className={i % 3 === 2 ? "bg-gray-500" : "bg-green-500"} />
+              </Avatar>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <span
                     className="font-semibold text-sm tracking-[-0.01em]"
-                    style={{ color: room.unread > 0 ? "#f0ead8" : "#a09890" }}
+                    style={{ color: room.unread > 0 ? "oklch(0.92 0.018 70)" : "#a09890" }}
                   >
                     {room.name}
                   </span>
-                  <span className="text-xs flex-shrink-0 ml-2" style={{ color: "#4a4540" }}>
+                  <span
+                    className="text-xs flex-shrink-0 ml-2"
+                    style={{ color: "oklch(0.38 0.008 60)" }}
+                  >
                     {room.time}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <p
                     className="text-xs truncate"
-                    style={{ color: room.unread > 0 ? "#a09890" : "#4a4540" }}
+                    style={{ color: room.unread > 0 ? "#a09890" : "oklch(0.38 0.008 60)" }}
                   >
                     {room.lastMessage}
                   </p>
                   {room.unread > 0 && (
-                    <span
-                      className="min-w-[1.25rem] h-5 rounded-full flex items-center justify-center text-xs font-bold px-1.5 flex-shrink-0 tabular-nums"
-                      style={{ background: "#d4a843", color: "#0d0c0a" }}
+                    <Badge
+                      variant="default"
+                      className="min-w-[1.25rem] h-5 rounded-full px-1.5 tabular-nums"
                     >
                       {room.unread}
-                    </span>
+                    </Badge>
                   )}
                 </div>
               </div>

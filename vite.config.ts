@@ -18,6 +18,7 @@ export default Object.assign(
       jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
       rules: { "vite-plus/prefer-vite-plus-imports": "off" },
       options: { typeAware: true, typeCheck: true },
+      ignorePatterns: [".claude/worktrees/**"],
     },
   },
 );
