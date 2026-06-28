@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
+import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { Textarea } from "~/components/ui/textarea";
 
 const roomData: Record<
   string,
@@ -147,6 +150,8 @@ export default function ChatRoom() {
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
   };
 
+  const canSend = !!input.trim();
+
   return (
     <div
       className="flex flex-col h-screen"
@@ -165,28 +170,33 @@ export default function ChatRoom() {
           backdropFilter: "blur(16px)",
         }}
       >
-        <Link
-          to="/chat"
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 active:scale-95 flex-shrink-0"
-          style={{ background: "rgba(240,234,216,0.06)", color: "#a09890" }}
+        <Button
+          variant="ghost"
+          size="icon"
+          asChild
+          className="flex-shrink-0 active:scale-95 hover:bg-white/5 text-[#a09890]"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </Link>
+          <Link to="/chat">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </Link>
+        </Button>
 
-        <div
-          className={`w-10 h-10 rounded-xl bg-gradient-to-br ${room.gradient} flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0`}
-        >
-          {room.name[0]}
-        </div>
+        <Avatar className="w-10 h-10 rounded-xl flex-shrink-0 shadow-lg after:rounded-xl">
+          <AvatarFallback
+            className={`bg-gradient-to-br ${room.gradient} text-white font-bold text-sm rounded-xl`}
+          >
+            {room.name[0]}
+          </AvatarFallback>
+        </Avatar>
 
         <div className="flex-1 min-w-0">
           <h2
@@ -200,13 +210,15 @@ export default function ChatRoom() {
           </p>
         </div>
 
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => setShowInfo((v) => !v)}
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 flex-shrink-0"
-          style={{
-            background: showInfo ? "rgba(212,168,67,0.12)" : "rgba(240,234,216,0.06)",
-            color: showInfo ? "#d4a843" : "#a09890",
-          }}
+          className={`flex-shrink-0 ${
+            showInfo
+              ? "bg-[rgba(212,168,67,0.12)] text-[#d4a843] hover:bg-[rgba(212,168,67,0.18)]"
+              : "text-[#a09890] hover:bg-white/5"
+          }`}
         >
           <svg
             width="16"
@@ -220,7 +232,7 @@ export default function ChatRoom() {
             <circle cx="19" cy="12" r="1" />
             <circle cx="5" cy="12" r="1" />
           </svg>
-        </button>
+        </Button>
       </div>
 
       {/* Info bar */}
@@ -271,11 +283,13 @@ export default function ChatRoom() {
                 {/* Avatar spacer / avatar */}
                 <div className="w-8 flex-shrink-0">
                   {!msg.isMe && showSender && (
-                    <div
-                      className={`w-8 h-8 rounded-full bg-gradient-to-br ${senderGradients[senderIndex >= 0 ? senderIndex : 0]} flex items-center justify-center text-white text-xs font-semibold shadow`}
-                    >
-                      {msg.sender[0]}
-                    </div>
+                    <Avatar className="w-8 h-8">
+                      <AvatarFallback
+                        className={`bg-gradient-to-br ${senderGradients[senderIndex >= 0 ? senderIndex : 0]} text-white text-xs font-semibold`}
+                      >
+                        {msg.sender[0]}
+                      </AvatarFallback>
+                    </Avatar>
                   )}
                 </div>
 
@@ -350,31 +364,30 @@ export default function ChatRoom() {
             border: `1px solid ${input ? "rgba(212,168,67,0.2)" : "rgba(240,234,216,0.07)"}`,
           }}
         >
-          <textarea
+          <Textarea
             ref={textareaRef}
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
             placeholder="メッセージを入力..."
             rows={1}
-            className="flex-1 resize-none outline-none bg-transparent text-sm leading-relaxed"
-            style={{
-              color: "#f0ead8",
-              minHeight: "24px",
-              maxHeight: "120px",
-            }}
+            className="flex-1 resize-none bg-transparent border-none outline-none shadow-none text-sm leading-relaxed placeholder:opacity-30 min-h-6 max-h-30 focus-visible:ring-0 py-0 px-0 [field-sizing:normal]"
           />
-          <button
+          <Button
             onClick={send}
-            disabled={!input.trim()}
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 active:scale-95 disabled:cursor-not-allowed"
-            style={{
-              background: input.trim()
-                ? "linear-gradient(135deg, #c9924a, #d4a843)"
-                : "rgba(240,234,216,0.06)",
-              color: input.trim() ? "#0d0c0a" : "#3a3530",
-              boxShadow: input.trim() ? "0 2px 12px rgba(212,168,67,0.3)" : "none",
-            }}
+            disabled={!canSend}
+            variant={canSend ? "default" : "ghost"}
+            size="icon"
+            style={
+              canSend
+                ? { background: "linear-gradient(135deg, #c9924a, #d4a843)", color: "#0d0c0a" }
+                : undefined
+            }
+            className={
+              canSend
+                ? "shadow-[0_2px_12px_oklch(0.73_0.11_70_/_0.3)]"
+                : "text-[oklch(0.3_0.008_60)]"
+            }
           >
             <svg
               width="15"
@@ -386,7 +399,7 @@ export default function ChatRoom() {
             >
               <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" />
             </svg>
-          </button>
+          </Button>
         </div>
         <p className="text-center text-[11px] mt-2" style={{ color: "#2a2520" }}>
           Enter で送信 · Shift+Enter で改行
