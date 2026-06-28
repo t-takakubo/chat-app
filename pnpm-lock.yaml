@@ -292,6 +292,13 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 0.2.1(@types/node@22.20.0)(@voidzero-dev/vite-plus-core@0.2.1(@types/node@22.20.0)(jiti@2.7.0)(typescript@5.9.3))(jiti@2.7.0)(typescript@5.9.3)
+    optionalDependencies:
+      '@voidzero-dev/vite-plus-linux-arm64-gnu':
+        specifier: 0.2.1
+        version: 0.2.1
+      '@voidzero-dev/vite-plus-linux-x64-gnu':
+        specifier: 0.2.1
+        version: 0.2.1
 
 packages:
 
