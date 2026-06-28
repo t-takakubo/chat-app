@@ -1,6 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router";
-import { ScrollArea } from "~/components/ui/scroll-area";
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "~/components/ui/message-scroller";
+import {
+  Message,
+  MessageAvatar,
+  MessageContent,
+  MessageFooter,
+  MessageHeader,
+} from "~/components/ui/message";
+import { Bubble, BubbleContent } from "~/components/ui/bubble";
+import { Marker, MarkerContent } from "~/components/ui/marker";
 
 const roomData: Record<
   string,
@@ -69,30 +85,62 @@ const seedMessages: Message[] = [
     isMe: false,
     time: "09:05",
   },
-  { id: "4", text: "了解です。確認します", sender: "me", isMe: true, time: "09:06" },
   {
-    id: "5",
+    id: "4",
+    text: "PRのリンクも貼っておきますね",
+    sender: "田中",
+    isMe: false,
+    time: "09:05",
+  },
+  { id: "5", text: "了解です。確認します", sender: "me", isMe: true, time: "09:06" },
+  {
+    id: "6",
     text: "何か質問があれば気軽に聞いてください！",
     sender: "佐藤",
     isMe: false,
     time: "09:10",
   },
   {
-    id: "6",
+    id: "7",
     text: "ありがとうございます。よろしくお願いします！",
     sender: "me",
     isMe: true,
     time: "09:11",
   },
   {
-    id: "7",
+    id: "8",
     text: "今日の午後にミーティングを設定しました",
     sender: "鈴木",
     isMe: false,
     time: "10:30",
   },
-  { id: "8", text: "参加します", sender: "me", isMe: true, time: "10:32" },
+  { id: "9", text: "参加します", sender: "me", isMe: true, time: "10:32" },
+  { id: "10", text: "自分も参加予定です", sender: "me", isMe: true, time: "10:32" },
 ];
+
+const chatTheme: React.CSSProperties = {
+  "--background": "oklch(0.09 0.008 60)",
+  "--foreground": "oklch(0.92 0.018 70)",
+  "--card": "oklch(0.13 0.008 60)",
+  "--card-foreground": "oklch(0.92 0.018 70)",
+  "--popover": "oklch(0.13 0.008 60)",
+  "--popover-foreground": "oklch(0.92 0.018 70)",
+  "--primary": "oklch(0.73 0.11 70)",
+  "--primary-foreground": "oklch(0.08 0 0)",
+  "--secondary": "oklch(0.15 0.006 60)",
+  "--secondary-foreground": "oklch(0.88 0.015 70)",
+  "--muted": "oklch(0.15 0.006 60)",
+  "--muted-foreground": "oklch(0.45 0.015 68)",
+  "--accent": "oklch(0.18 0.007 60)",
+  "--accent-foreground": "oklch(0.92 0.018 70)",
+  "--border": "oklch(1 0 0 / 0.06)",
+  "--input": "oklch(1 0 0 / 0.08)",
+  "--ring": "oklch(0.73 0.11 70)",
+  "--radius": "0.75rem",
+  background: "oklch(0.09 0.008 60)",
+  color: "oklch(0.92 0.018 70)",
+  fontFamily: "'Geist Variable', sans-serif",
+} as React.CSSProperties;
 
 export default function ChatRoom() {
   const { id } = useParams();
@@ -106,12 +154,6 @@ export default function ChatRoom() {
   const [messages, setMessages] = useState<Message[]>(seedMessages);
   const [input, setInput] = useState("");
   const [showInfo, setShowInfo] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   const send = () => {
     const text = input.trim();
@@ -128,9 +170,6 @@ export default function ChatRoom() {
       },
     ]);
     setInput("");
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -148,27 +187,20 @@ export default function ChatRoom() {
   };
 
   return (
-    <div
-      className="flex flex-col h-screen"
-      style={{
-        background: "#0d0c0a",
-        color: "#f0ead8",
-        fontFamily: "'Geist Variable', sans-serif",
-      }}
-    >
+    <div className="flex flex-col h-screen" style={chatTheme}>
       {/* Header */}
       <div
         className="flex items-center gap-3 px-4 py-3.5 flex-shrink-0"
         style={{
-          borderBottom: "1px solid rgba(240,234,216,0.06)",
-          background: "rgba(13,12,10,0.9)",
+          borderBottom: "1px solid oklch(1 0 0 / 0.06)",
+          background: "oklch(0.09 0.008 60 / 0.9)",
           backdropFilter: "blur(16px)",
         }}
       >
         <Link
           to="/chat"
           className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 active:scale-95 flex-shrink-0"
-          style={{ background: "rgba(240,234,216,0.06)", color: "#a09890" }}
+          style={{ background: "oklch(1 0 0 / 0.06)", color: "oklch(0.65 0.015 68)" }}
         >
           <svg
             width="16"
@@ -189,13 +221,8 @@ export default function ChatRoom() {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2
-            className="font-semibold text-sm tracking-[-0.01em] leading-none"
-            style={{ color: "#f0ead8" }}
-          >
-            {room.name}
-          </h2>
-          <p className="text-xs mt-1" style={{ color: "#4a4540" }}>
+          <h2 className="font-semibold text-sm tracking-[-0.01em] leading-none">{room.name}</h2>
+          <p className="text-xs mt-1" style={{ color: "oklch(0.38 0.008 60)" }}>
             {room.members}人のメンバー · {room.description}
           </p>
         </div>
@@ -204,8 +231,8 @@ export default function ChatRoom() {
           onClick={() => setShowInfo((v) => !v)}
           className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 flex-shrink-0"
           style={{
-            background: showInfo ? "rgba(212,168,67,0.12)" : "rgba(240,234,216,0.06)",
-            color: showInfo ? "#d4a843" : "#a09890",
+            background: showInfo ? "oklch(0.73 0.11 70 / 0.12)" : "oklch(1 0 0 / 0.06)",
+            color: showInfo ? "oklch(0.73 0.11 70)" : "oklch(0.65 0.015 68)",
           }}
         >
           <svg
@@ -228,141 +255,107 @@ export default function ChatRoom() {
         <div
           className="px-5 py-3 flex-shrink-0 flex items-center justify-between text-xs"
           style={{
-            background: "rgba(212,168,67,0.06)",
-            borderBottom: "1px solid rgba(212,168,67,0.1)",
-            color: "#a09890",
+            background: "oklch(0.73 0.11 70 / 0.06)",
+            borderBottom: "1px solid oklch(0.73 0.11 70 / 0.1)",
+            color: "oklch(0.65 0.015 68)",
           }}
         >
           <span>
             #{room.name} · {messages.length} 件のメッセージ
           </span>
-          <button style={{ color: "#d4a843" }} className="font-medium">
+          <button style={{ color: "oklch(0.73 0.11 70)" }} className="font-medium">
             メンバー一覧
           </button>
         </div>
       )}
 
-      {/* Messages */}
-      <ScrollArea className="flex-1">
-        <div className="px-4 py-6 space-y-1 max-w-2xl mx-auto">
-          {/* Date divider */}
-          <div className="flex items-center gap-3 py-4">
-            <div className="flex-1 h-px" style={{ background: "rgba(240,234,216,0.06)" }} />
-            <span className="text-xs font-medium" style={{ color: "#3a3530" }}>
-              今日
-            </span>
-            <div className="flex-1 h-px" style={{ background: "rgba(240,234,216,0.06)" }} />
-          </div>
+      {/* Message area */}
+      <div className="flex-1 min-h-0">
+        <MessageScrollerProvider>
+          <MessageScroller>
+            <MessageScrollerViewport>
+              <MessageScrollerContent className="py-6 gap-4 max-w-2xl mx-auto px-4">
+                {/* Date separator */}
+                <MessageScrollerItem>
+                  <Marker variant="separator">
+                    <MarkerContent>今日</MarkerContent>
+                  </Marker>
+                </MessageScrollerItem>
 
-          {messages.map((msg, i) => {
-            const showSender =
-              !msg.isMe &&
-              (i === 0 || messages[i - 1].sender !== msg.sender || messages[i - 1].isMe);
-            const isConsecutive =
-              !msg.isMe && i > 0 && messages[i - 1].sender === msg.sender && !messages[i - 1].isMe;
-            const senderIndex =
-              ["田中", "佐藤", "鈴木", "山田"].indexOf(msg.sender) % senderGradients.length;
+                {/* Messages */}
+                {messages.map((msg, i) => {
+                  const prev = messages[i - 1];
+                  const isGroupStart =
+                    !prev || prev.sender !== msg.sender || prev.isMe !== msg.isMe;
+                  const isLast = i === messages.length - 1;
+                  const senderIdx = ["田中", "佐藤", "鈴木", "山田"].indexOf(msg.sender);
+                  const grad = senderGradients[Math.max(0, senderIdx) % senderGradients.length];
 
-            return (
-              <div
-                key={msg.id}
-                className={`flex items-end gap-2.5 ${msg.isMe ? "flex-row-reverse" : "flex-row"} ${isConsecutive ? "mt-0.5" : "mt-4"}`}
-              >
-                {/* Avatar spacer / avatar */}
-                <div className="w-8 flex-shrink-0">
-                  {!msg.isMe && showSender && (
-                    <div
-                      className={`w-8 h-8 rounded-full bg-gradient-to-br ${senderGradients[senderIndex >= 0 ? senderIndex : 0]} flex items-center justify-center text-white text-xs font-semibold shadow`}
+                  return (
+                    <MessageScrollerItem
+                      key={msg.id}
+                      scrollAnchor={isLast}
+                      className={isGroupStart ? "" : "-mt-2"}
                     >
-                      {msg.sender[0]}
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  className={`flex flex-col gap-0.5 max-w-[72%] ${msg.isMe ? "items-end" : "items-start"}`}
-                >
-                  {!msg.isMe && showSender && (
-                    <span
-                      className="text-xs font-medium ml-0.5 mb-0.5"
-                      style={{ color: "#6b6560" }}
-                    >
-                      {msg.sender}
-                    </span>
-                  )}
-
-                  <div className="flex items-end gap-1.5">
-                    {msg.isMe && (
-                      <span
-                        className="text-[10px] mb-0.5 flex-shrink-0"
-                        style={{ color: "#3a3530" }}
-                      >
-                        {msg.time}
-                      </span>
-                    )}
-                    <div
-                      className="px-4 py-2.5 text-sm leading-relaxed"
-                      style={
-                        msg.isMe
-                          ? {
-                              background: "linear-gradient(135deg, #c9924a 0%, #d4a843 100%)",
-                              color: "#0d0c0a",
-                              borderRadius: "18px 18px 4px 18px",
-                              fontWeight: 500,
-                              boxShadow: "0 2px 12px rgba(212,168,67,0.2)",
-                            }
-                          : {
-                              background: "rgba(240,234,216,0.07)",
-                              color: "#e0d8c8",
-                              borderRadius: "4px 18px 18px 18px",
-                              border: "1px solid rgba(240,234,216,0.06)",
-                            }
-                      }
-                    >
-                      {msg.text}
-                    </div>
-                    {!msg.isMe && (
-                      <span
-                        className="text-[10px] mb-0.5 flex-shrink-0"
-                        style={{ color: "#3a3530" }}
-                      >
-                        {msg.time}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-          <div ref={bottomRef} className="h-2" />
-        </div>
-      </ScrollArea>
+                      <Message align={msg.isMe ? "end" : "start"}>
+                        {!msg.isMe && (
+                          <MessageAvatar>
+                            {isGroupStart ? (
+                              <div
+                                className={`w-8 h-8 rounded-full bg-gradient-to-br ${grad} flex items-center justify-center text-white text-xs font-semibold shadow`}
+                              >
+                                {msg.sender[0]}
+                              </div>
+                            ) : (
+                              <div className="w-8 h-8" />
+                            )}
+                          </MessageAvatar>
+                        )}
+                        <MessageContent>
+                          {!msg.isMe && isGroupStart && <MessageHeader>{msg.sender}</MessageHeader>}
+                          <Bubble
+                            variant={msg.isMe ? "default" : "secondary"}
+                            align={msg.isMe ? "end" : "start"}
+                          >
+                            <BubbleContent>{msg.text}</BubbleContent>
+                          </Bubble>
+                          {isLast ||
+                          messages[i + 1]?.sender !== msg.sender ||
+                          messages[i + 1]?.isMe !== msg.isMe ? (
+                            <MessageFooter>{msg.time}</MessageFooter>
+                          ) : null}
+                        </MessageContent>
+                      </Message>
+                    </MessageScrollerItem>
+                  );
+                })}
+              </MessageScrollerContent>
+            </MessageScrollerViewport>
+            <MessageScrollerButton />
+          </MessageScroller>
+        </MessageScrollerProvider>
+      </div>
 
       {/* Input area */}
       <div
         className="px-4 pb-6 pt-3 flex-shrink-0"
-        style={{ borderTop: "1px solid rgba(240,234,216,0.05)" }}
+        style={{ borderTop: "1px solid oklch(1 0 0 / 0.05)" }}
       >
         <div
           className="flex items-end gap-3 max-w-2xl mx-auto rounded-2xl px-4 py-3 transition-all duration-200"
           style={{
-            background: "rgba(240,234,216,0.04)",
-            border: `1px solid ${input ? "rgba(212,168,67,0.2)" : "rgba(240,234,216,0.07)"}`,
+            background: "oklch(1 0 0 / 0.04)",
+            border: `1px solid ${input ? "oklch(0.73 0.11 70 / 0.2)" : "oklch(1 0 0 / 0.07)"}`,
           }}
         >
           <textarea
-            ref={textareaRef}
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
             placeholder="メッセージを入力..."
             rows={1}
-            className="flex-1 resize-none outline-none bg-transparent text-sm leading-relaxed"
-            style={{
-              color: "#f0ead8",
-              minHeight: "24px",
-              maxHeight: "120px",
-            }}
+            className="flex-1 resize-none outline-none bg-transparent text-sm leading-relaxed placeholder:opacity-30"
+            style={{ minHeight: "24px", maxHeight: "120px" }}
           />
           <button
             onClick={send}
@@ -370,10 +363,10 @@ export default function ChatRoom() {
             className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 active:scale-95 disabled:cursor-not-allowed"
             style={{
               background: input.trim()
-                ? "linear-gradient(135deg, #c9924a, #d4a843)"
-                : "rgba(240,234,216,0.06)",
-              color: input.trim() ? "#0d0c0a" : "#3a3530",
-              boxShadow: input.trim() ? "0 2px 12px rgba(212,168,67,0.3)" : "none",
+                ? "linear-gradient(135deg, oklch(0.65 0.12 55), oklch(0.73 0.11 70))"
+                : "oklch(1 0 0 / 0.06)",
+              color: input.trim() ? "oklch(0.08 0 0)" : "oklch(0.3 0.008 60)",
+              boxShadow: input.trim() ? "0 2px 12px oklch(0.73 0.11 70 / 0.3)" : "none",
             }}
           >
             <svg
@@ -388,7 +381,7 @@ export default function ChatRoom() {
             </svg>
           </button>
         </div>
-        <p className="text-center text-[11px] mt-2" style={{ color: "#2a2520" }}>
+        <p className="text-center text-[11px] mt-2" style={{ color: "oklch(0.28 0.005 60)" }}>
           Enter で送信 · Shift+Enter で改行
         </p>
       </div>

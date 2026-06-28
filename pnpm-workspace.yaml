@@ -5,6 +5,8 @@ catalog:
 overrides:
   vite: "catalog:"
   vitest: "catalog:"
+  postcss: "8.5.15"
+  prettier: "3.9.0"
 peerDependencyRules:
   allowAny:
     - vite
