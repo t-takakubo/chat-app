@@ -7,6 +7,8 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
+    "deploy": "react-router build && wrangler pages deploy",
+    "preview": "react-router build && wrangler pages dev",
     "prepare": "node -e \"if(!process.env.CI)require('child_process').execSync('vp config',{stdio:'inherit'})\""
   },
   "dependencies": {
@@ -35,7 +37,8 @@
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "wrangler": "^4.105.0"
   },
   "optionalDependencies": {
     "@voidzero-dev/vite-plus-linux-arm64-gnu": "0.2.1",
