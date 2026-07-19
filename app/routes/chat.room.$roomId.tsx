@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router";
+import { cn } from "~/lib/utils";
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -30,18 +31,10 @@ export default function ChatRoomLive() {
   return (
     <div className="chat-theme bg-background text-foreground flex flex-col h-screen">
       {/* Header */}
-      <div
-        className="flex items-center gap-3 px-4 py-3.5 flex-shrink-0"
-        style={{
-          borderBottom: "1px solid oklch(1 0 0 / 0.06)",
-          background: "oklch(0.09 0.008 60 / 0.9)",
-          backdropFilter: "blur(16px)",
-        }}
-      >
+      <div className="flex items-center gap-3 px-4 py-3.5 flex-shrink-0 border-b border-border bg-background/90 backdrop-blur-lg">
         <Link
           to="/chat"
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 active:scale-95 flex-shrink-0"
-          style={{ background: "oklch(1 0 0 / 0.06)", color: "oklch(0.65 0.015 68)" }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 active:scale-95 flex-shrink-0 bg-white/[0.06] text-chat-icon-muted"
         >
           <svg
             width="16"
@@ -55,10 +48,7 @@ export default function ChatRoomLive() {
           </svg>
         </Link>
 
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0"
-          style={{ background: "oklch(0.6 0.13 25)" }}
-        >
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0 bg-chat-avatar">
           {(peerName ?? "?")[0]}
         </div>
 
@@ -66,13 +56,12 @@ export default function ChatRoomLive() {
           <h2 className="font-semibold text-sm tracking-[-0.01em] leading-none">
             {peerName ?? "相手を待っています…"}
           </h2>
-          <p
-            className="text-xs mt-1 flex items-center gap-1.5"
-            style={{ color: "oklch(0.38 0.008 60)" }}
-          >
+          <p className="text-xs mt-1 flex items-center gap-1.5 text-chat-faint">
             <span
-              className="inline-block w-1.5 h-1.5 rounded-full"
-              style={{ background: peerOnline ? "oklch(0.7 0.16 145)" : "oklch(0.4 0.008 60)" }}
+              className={cn(
+                "inline-block w-1.5 h-1.5 rounded-full",
+                peerOnline ? "bg-chat-status-online" : "bg-chat-faint",
+              )}
             />
             {peerOnline ? "オンライン" : "オフライン"}
           </p>
@@ -109,10 +98,7 @@ export default function ChatRoomLive() {
                         {!isMe && (
                           <MessageAvatar>
                             {isGroupStart ? (
-                              <div
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow"
-                                style={{ background: "oklch(0.6 0.13 25)" }}
-                              >
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow bg-chat-avatar">
                                 {msg.authorName[0]}
                               </div>
                             ) : (
