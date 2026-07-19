@@ -61,6 +61,72 @@ body {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* --- chat feature: semantic colors (see .chat-theme below for values) --- */
+  --color-chat-avatar: var(--chat-avatar);
+  --color-chat-accent-warm: var(--chat-accent-warm);
+  --color-chat-primary-from: var(--chat-primary-from);
+  --color-chat-status-online: var(--chat-status-online);
+  --color-chat-icon-muted: var(--chat-icon-muted);
+  --color-chat-tertiary: var(--chat-tertiary);
+  --color-chat-secondary-text: var(--chat-secondary-text);
+  --color-chat-faint: var(--chat-faint);
+  --color-chat-subtle: var(--chat-subtle);
+  --color-chat-ghost: var(--chat-ghost);
+  /* --- chat feature: custom animations (chat/match screen) --- */
+  --animate-orbit-spin: orbit-spin var(--chat-orbit-duration, 8s) linear infinite;
+  --animate-pulse-ring: pulse-ring 2.4s ease-out infinite;
+  --animate-gentle-pulse: gentle-pulse 2.6s ease-in-out infinite;
+  --animate-draw-line: draw-line 0.5s ease-out;
+  --animate-rise-in: rise-in 0.4s ease-out;
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+@keyframes gentle-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+}
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 :root {
@@ -130,6 +196,47 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/*
+ * Chat feature theme — warm/amber dark palette used only on /chat routes.
+ * Scoped via the opt-in `.chat-theme` class; independent from `.dark`,
+ * so it never affects light/dark mode on the rest of the app.
+ */
+.chat-theme {
+  --background: oklch(0.09 0.008 60);
+  --foreground: oklch(0.92 0.018 70);
+  --card: oklch(0.13 0.008 60);
+  --card-foreground: oklch(0.92 0.018 70);
+  --popover: oklch(0.13 0.008 60);
+  --popover-foreground: oklch(0.92 0.018 70);
+  --primary: oklch(0.73 0.11 70);
+  --primary-foreground: oklch(0.08 0 0);
+  --secondary: oklch(0.15 0.006 60);
+  --secondary-foreground: oklch(0.88 0.015 70);
+  --muted: oklch(0.15 0.006 60);
+  --muted-foreground: oklch(0.45 0.015 68);
+  --accent: oklch(0.18 0.007 60);
+  --accent-foreground: oklch(0.92 0.018 70);
+  --border: oklch(1 0 0 / 0.06);
+  --input: oklch(1 0 0 / 0.08);
+  --ring: oklch(0.73 0.11 70);
+  --radius: 0.75rem;
+
+  /* chat-only semantic colors, not part of shadcn's base palette */
+  --chat-avatar: oklch(0.6 0.13 25);
+  --chat-accent-warm: oklch(0.74 0.14 25);
+  --chat-primary-from: oklch(0.65 0.12 55);
+  --chat-status-online: oklch(0.7 0.16 145);
+  --chat-icon-muted: oklch(0.65 0.015 68);
+  --chat-tertiary: oklch(0.6 0.02 68);
+  --chat-secondary-text: oklch(0.5 0.02 68);
+  --chat-faint: oklch(0.39 0.008 60);
+  --chat-subtle: oklch(0.3 0.008 60);
+  --chat-ghost: oklch(0.28 0.005 60);
+
+  background: var(--background);
+  color: var(--foreground);
 }
 
 @layer base {
