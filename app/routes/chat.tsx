@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { Avatar, AvatarBadge, AvatarFallback } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { chatTheme, gradients } from "~/lib/chat-theme";
 
 const rooms = [
   {
@@ -56,39 +57,6 @@ const rooms = [
     members: 30,
   },
 ];
-
-const gradients = [
-  "from-amber-400 to-orange-500",
-  "from-violet-400 to-purple-500",
-  "from-emerald-400 to-teal-500",
-  "from-blue-400 to-indigo-500",
-  "from-rose-400 to-pink-500",
-  "from-cyan-400 to-sky-500",
-];
-
-const chatTheme = {
-  "--background": "oklch(0.09 0.008 60)",
-  "--foreground": "oklch(0.92 0.018 70)",
-  "--card": "oklch(0.13 0.008 60)",
-  "--card-foreground": "oklch(0.92 0.018 70)",
-  "--popover": "oklch(0.13 0.008 60)",
-  "--popover-foreground": "oklch(0.92 0.018 70)",
-  "--primary": "oklch(0.73 0.11 70)",
-  "--primary-foreground": "oklch(0.08 0 0)",
-  "--secondary": "oklch(0.15 0.006 60)",
-  "--secondary-foreground": "oklch(0.88 0.015 70)",
-  "--muted": "oklch(0.15 0.006 60)",
-  "--muted-foreground": "oklch(0.45 0.015 68)",
-  "--accent": "oklch(0.18 0.007 60)",
-  "--accent-foreground": "oklch(0.92 0.018 70)",
-  "--border": "oklch(1 0 0 / 0.06)",
-  "--input": "oklch(1 0 0 / 0.08)",
-  "--ring": "oklch(0.73 0.11 70)",
-  "--radius": "0.75rem",
-  background: "oklch(0.09 0.008 60)",
-  color: "oklch(0.92 0.018 70)",
-  fontFamily: "'Geist Variable', sans-serif",
-} as React.CSSProperties;
 
 export default function Chat() {
   const [search, setSearch] = useState("");
@@ -158,6 +126,55 @@ export default function Chat() {
       {/* Room List */}
       <ScrollArea className="flex-1">
         <div className="py-3">
+          <Link
+            to="/chat/match"
+            className="flex items-center gap-4 mx-4 mb-3 px-4 py-3.5 rounded-2xl transition-all duration-150 group"
+            style={{
+              background: "oklch(0.73 0.11 70 / 0.08)",
+              border: "1px solid oklch(0.73 0.11 70 / 0.16)",
+            }}
+          >
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-150 group-hover:scale-105"
+              style={{ background: "oklch(0.73 0.11 70 / 0.14)", color: "oklch(0.73 0.11 70)" }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <circle cx="12" cy="12" r="8" opacity="0.5" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p
+                className="font-semibold text-sm tracking-[-0.01em]"
+                style={{ color: "oklch(0.92 0.018 70)" }}
+              >
+                話す相手を探す
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: "oklch(0.5 0.02 68)" }}>
+                コミュニティの誰かとランダムに1対1で
+              </p>
+            </div>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="flex-shrink-0 transition-transform duration-150 group-hover:translate-x-0.5"
+              style={{ color: "oklch(0.73 0.11 70)" }}
+            >
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </Link>
+
           {filtered.length === 0 && (
             <p className="text-center py-12 text-sm" style={{ color: "oklch(0.38 0.008 60)" }}>
               見つかりませんでした
