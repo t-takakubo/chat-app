@@ -17,7 +17,6 @@ import {
 import { Bubble, BubbleContent } from "~/components/ui/bubble";
 import { Marker, MarkerContent } from "~/components/ui/marker";
 import { ChatComposer } from "~/components/chat-composer";
-import { chatTheme } from "~/lib/chat-theme";
 import { useChatRoom } from "~/lib/use-chat-room";
 
 function formatTime(timestamp: number) {
@@ -29,7 +28,7 @@ export default function ChatRoomLive() {
   const { messages, peerOnline, peerName, send, userId } = useChatRoom(roomId ?? "");
 
   return (
-    <div className="flex flex-col h-screen" style={chatTheme}>
+    <div className="chat-theme bg-background text-foreground flex flex-col h-screen">
       {/* Header */}
       <div
         className="flex items-center gap-3 px-4 py-3.5 flex-shrink-0"

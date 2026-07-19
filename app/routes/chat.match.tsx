@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
-import { chatTheme } from "~/lib/chat-theme";
 import { useMatchQueue } from "~/lib/use-match-queue";
 import { getIdentity, setDisplayName } from "~/lib/session";
 
@@ -28,7 +27,7 @@ export default function ChatMatch() {
   };
 
   return (
-    <div className="flex flex-col h-screen" style={chatTheme}>
+    <div className="chat-theme bg-background text-foreground flex flex-col h-screen">
       <style>{`
         @keyframes orbit-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse-ring { 0% { transform: scale(0.75); opacity: 0.45; } 100% { transform: scale(1.9); opacity: 0; } }
