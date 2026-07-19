@@ -5,6 +5,10 @@
 # React Router
 /.react-router/
 /build/
+
+# Wrangler local dev state
+/.wrangler/
+/worker/.wrangler/
 !.vscode/
 !.vscode/settings.json
 !.vscode/extensions.json
