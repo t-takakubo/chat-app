@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Cloudflare Pages project name — must match your existing Pages project.
+  "name": "chat-app-web",
+  "compatibility_date": "2026-06-28",
+  // CSR/SPA static build output from `react-router build` (ssr: false).
+  "pages_build_output_dir": "./build/client",
+}
