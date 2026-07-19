@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "~/lib/utils";
 
 export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
   const [input, setInput] = useState("");
@@ -25,16 +26,12 @@ export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
   };
 
   return (
-    <div
-      className="px-4 pb-6 pt-3 flex-shrink-0"
-      style={{ borderTop: "1px solid oklch(1 0 0 / 0.05)" }}
-    >
+    <div className="px-4 pb-6 pt-3 flex-shrink-0 border-t border-white/[0.05]">
       <div
-        className="flex items-end gap-3 max-w-2xl mx-auto rounded-2xl px-4 py-3 transition-all duration-200"
-        style={{
-          background: "oklch(1 0 0 / 0.04)",
-          border: `1px solid ${input ? "oklch(0.73 0.11 70 / 0.2)" : "oklch(1 0 0 / 0.07)"}`,
-        }}
+        className={cn(
+          "flex items-end gap-3 max-w-2xl mx-auto rounded-2xl px-4 py-3 transition-all duration-200 bg-white/[0.04] border",
+          input ? "border-primary/20" : "border-white/[0.07]",
+        )}
       >
         <textarea
           value={input}
@@ -42,20 +39,17 @@ export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
           onKeyDown={handleKeyDown}
           placeholder="メッセージを入力..."
           rows={1}
-          className="flex-1 resize-none outline-none bg-transparent text-sm leading-relaxed placeholder:opacity-30"
-          style={{ minHeight: "24px", maxHeight: "120px" }}
+          className="flex-1 resize-none outline-none bg-transparent text-sm leading-relaxed placeholder:opacity-30 min-h-6 max-h-[120px]"
         />
         <button
           onClick={send}
           disabled={!input.trim()}
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 active:scale-95 disabled:cursor-not-allowed"
-          style={{
-            background: input.trim()
-              ? "linear-gradient(135deg, oklch(0.65 0.12 55), oklch(0.73 0.11 70))"
-              : "oklch(1 0 0 / 0.06)",
-            color: input.trim() ? "oklch(0.08 0 0)" : "oklch(0.3 0.008 60)",
-            boxShadow: input.trim() ? "0 2px 12px oklch(0.73 0.11 70 / 0.3)" : "none",
-          }}
+          className={cn(
+            "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 active:scale-95 disabled:cursor-not-allowed",
+            input.trim()
+              ? "bg-linear-to-br from-chat-primary-from to-primary text-primary-foreground shadow-[0_2px_12px_color-mix(in_oklch,var(--primary)_30%,transparent)]"
+              : "bg-white/[0.06] text-chat-subtle",
+          )}
         >
           <svg
             width="15"
@@ -69,7 +63,7 @@ export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
           </svg>
         </button>
       </div>
-      <p className="text-center text-[11px] mt-2" style={{ color: "oklch(0.28 0.005 60)" }}>
+      <p className="text-center text-[11px] mt-2 text-chat-ghost">
         Enter で送信 · Shift+Enter で改行
       </p>
     </div>
