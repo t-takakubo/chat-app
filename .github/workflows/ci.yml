@@ -29,5 +29,8 @@ jobs:
         env:
           CI: true
 
+      - name: Generate route types
+        run: pnpm exec react-router typegen
+
       - name: Format, lint, and type check
         run: pnpm exec vp check
