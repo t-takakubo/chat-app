@@ -1,5 +1,6 @@
-import { useParams, Link } from "react-router";
+import { useParams } from "react-router";
 import { cn } from "~/lib/utils";
+import { ChatBackLink } from "~/components/chat-back-link";
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -32,21 +33,7 @@ export default function ChatRoomLive() {
     <div className="chat-theme bg-background text-foreground flex flex-col h-screen">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3.5 flex-shrink-0 border-b border-border bg-background/90 backdrop-blur-lg">
-        <Link
-          to="/chat"
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 active:scale-95 flex-shrink-0 bg-white/[0.06] text-chat-icon-muted"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </Link>
+        <ChatBackLink to="/chat" />
 
         <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0 bg-chat-avatar">
           {(peerName ?? "?")[0]}
