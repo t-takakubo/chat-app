@@ -22,6 +22,7 @@ import {
 import { Bubble, BubbleContent } from "~/components/ui/bubble";
 import { ChatComposer } from "~/components/chat-composer";
 import { MatchedIntro } from "~/components/matched-intro";
+import { TypingIndicator } from "~/components/typing-indicator";
 import { useChatRoom } from "~/lib/use-chat-room";
 import { SITE_NAME } from "~/lib/seo";
 import type { Route } from "./+types/chat.room.$roomId";
@@ -41,9 +42,8 @@ export default function ChatRoomLive() {
   const navigate = useNavigate();
   const [peerLeftDialogOpen, setPeerLeftDialogOpen] = useState(false);
 
-  const { messages, peerOnline, peerName, send, leave, userId } = useChatRoom(roomId ?? "", () =>
-    setPeerLeftDialogOpen(true),
-  );
+  const { messages, peerOnline, peerTyping, peerName, send, sendTyping, leave, userId } =
+    useChatRoom(roomId ?? "", () => setPeerLeftDialogOpen(true));
 
   const handleEnd = () => {
     leave();
@@ -129,6 +129,12 @@ export default function ChatRoomLive() {
                     </MessageScrollerItem>
                   );
                 })}
+
+                {peerTyping && (
+                  <MessageScrollerItem scrollAnchor className="-mt-2">
+                    <TypingIndicator authorName={peerName ?? "?"} />
+                  </MessageScrollerItem>
+                )}
               </MessageScrollerContent>
             </MessageScrollerViewport>
             <MessageScrollerButton />
@@ -136,7 +142,7 @@ export default function ChatRoomLive() {
         </MessageScrollerProvider>
       </div>
 
-      <ChatComposer onSend={send} />
+      <ChatComposer onSend={send} onTypingChange={sendTyping} />
 
       <PeerLeftDialog
         open={peerLeftDialogOpen}

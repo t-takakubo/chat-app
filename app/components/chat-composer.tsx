@@ -1,14 +1,46 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SendHorizontal } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 
-export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
+// 入力を止めてからこの時間が経ったら「入力中」を解除する
+const TYPING_IDLE_MS = 2000;
+
+export function ChatComposer({
+  onSend,
+  onTypingChange,
+}: {
+  onSend: (text: string) => void;
+  onTypingChange?: (isTyping: boolean) => void;
+}) {
   const [input, setInput] = useState("");
+  const typingTimeoutRef = useRef<number | null>(null);
+
+  const stopTyping = () => {
+    if (typingTimeoutRef.current !== null) {
+      window.clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+    onTypingChange?.(false);
+  };
+
+  useEffect(() => stopTyping, []);
+
+  const handleChange = (value: string) => {
+    setInput(value);
+    if (!value.trim()) {
+      stopTyping();
+      return;
+    }
+    onTypingChange?.(true);
+    if (typingTimeoutRef.current !== null) window.clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = window.setTimeout(stopTyping, TYPING_IDLE_MS);
+  };
 
   const send = () => {
     const text = input.trim();
     if (!text) return;
+    stopTyping();
     onSend(text);
     setInput("");
   };
@@ -27,7 +59,7 @@ export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
       <div className="mx-auto flex max-w-2xl items-end gap-2 rounded-2xl border-2 border-input bg-card px-3 py-2 shadow-xs transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
         <Textarea
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="メッセージを入力…"
           rows={1}

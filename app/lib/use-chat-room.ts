@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChatMessage, RoomClientEvent, RoomServerEvent } from "../../shared/match-protocol";
 import { matchWsUrl } from "./match-config";
 import { getIdentity } from "./session";
 import { useJsonWebSocket } from "./use-json-websocket";
 
 export type RoomStatus = "connecting" | "open" | "closed";
+
+// 相手の「入力中」false通知が届かなかった場合に自動で消すまでの猶予
+const PEER_TYPING_TIMEOUT_MS = 5000;
 
 function isPageVisible() {
   return document.visibilityState === "visible" && document.hasFocus();
@@ -14,9 +17,18 @@ export function useChatRoom(roomId: string, onPeerLeft?: () => void) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [peerConnected, setPeerConnected] = useState(false);
   const [peerVisible, setPeerVisible] = useState(true);
+  const [peerTyping, setPeerTyping] = useState(false);
   const [peerName, setPeerName] = useState<string | null>(null);
   const [status, setStatus] = useState<RoomStatus>("connecting");
   const [identity] = useState(() => getIdentity());
+  const peerTypingTimeoutRef = useRef<number | null>(null);
+
+  const clearPeerTypingTimeout = () => {
+    if (peerTypingTimeoutRef.current !== null) {
+      window.clearTimeout(peerTypingTimeoutRef.current);
+      peerTypingTimeoutRef.current = null;
+    }
+  };
 
   const {
     connect,
@@ -40,6 +52,10 @@ export function useChatRoom(roomId: string, onPeerLeft?: () => void) {
           break;
         case "message":
           setMessages((prev) => [...prev, data.message]);
+          if (data.message.authorId !== identity.userId) {
+            clearPeerTypingTimeout();
+            setPeerTyping(false);
+          }
           break;
         case "peer-joined":
           setPeerName(data.name);
@@ -49,10 +65,22 @@ export function useChatRoom(roomId: string, onPeerLeft?: () => void) {
         case "peer-left":
           setPeerConnected(false);
           setPeerVisible(true);
+          clearPeerTypingTimeout();
+          setPeerTyping(false);
           onPeerLeft?.();
           break;
         case "peer-presence":
           setPeerVisible(data.visible);
+          break;
+        case "peer-typing":
+          clearPeerTypingTimeout();
+          setPeerTyping(data.isTyping);
+          if (data.isTyping) {
+            peerTypingTimeoutRef.current = window.setTimeout(() => {
+              setPeerTyping(false);
+              peerTypingTimeoutRef.current = null;
+            }, PEER_TYPING_TIMEOUT_MS);
+          }
           break;
       }
     },
@@ -65,11 +93,15 @@ export function useChatRoom(roomId: string, onPeerLeft?: () => void) {
     setMessages([]);
     setPeerConnected(false);
     setPeerVisible(true);
+    setPeerTyping(false);
     setPeerName(null);
     setStatus("connecting");
     connect(url);
 
-    return () => disconnect(1000, "unmount");
+    return () => {
+      clearPeerTypingTimeout();
+      disconnect(1000, "unmount");
+    };
   }, [roomId, identity, connect, disconnect]);
 
   useEffect(() => {
@@ -93,6 +125,10 @@ export function useChatRoom(roomId: string, onPeerLeft?: () => void) {
     sendJson(event);
   };
 
+  const sendTyping = (isTyping: boolean) => {
+    sendJson({ type: "typing", isTyping } satisfies RoomClientEvent);
+  };
+
   const leave = () => {
     disconnect(1000, "left");
   };
@@ -100,9 +136,11 @@ export function useChatRoom(roomId: string, onPeerLeft?: () => void) {
   return {
     messages,
     peerOnline: peerConnected && peerVisible,
+    peerTyping,
     peerName,
     status,
     send,
+    sendTyping,
     leave,
     userId: identity.userId,
   };

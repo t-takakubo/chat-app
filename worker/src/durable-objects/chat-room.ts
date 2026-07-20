@@ -117,6 +117,13 @@ export class ChatRoom extends DurableObject<Env> {
       }
       return;
     }
+    if (event.type === "typing") {
+      for (const member of this.ctx.getWebSockets(MEMBER_TAG)) {
+        if (member === ws) continue;
+        this.send(member, { type: "peer-typing", isTyping: event.isTyping });
+      }
+      return;
+    }
     if (event.type !== "message") return;
 
     const body = event.body.trim().slice(0, MAX_BODY_LENGTH);
