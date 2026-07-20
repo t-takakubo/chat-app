@@ -7,10 +7,9 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "deploy": "react-router build && wrangler pages deploy",
-    "preview": "react-router build && wrangler pages dev",
-    "worker:dev": "wrangler dev --config worker/wrangler.jsonc",
-    "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
+    "deploy": "react-router build && wrangler deploy",
+    "preview": "react-router build && wrangler dev",
+    "worker:dev": "wrangler dev",
     "worker:typecheck": "tsc -p worker/tsconfig.json --noEmit",
     "prepare": "node -e \"if(!process.env.CI)require('child_process').execSync('vp config',{stdio:'inherit'})\""
   },

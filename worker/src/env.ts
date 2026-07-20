@@ -4,4 +4,5 @@ import type { ChatRoom } from "./durable-objects/chat-room";
 export interface Env {
   MATCH_QUEUE: DurableObjectNamespace<MatchQueue>;
   CHAT_ROOM: DurableObjectNamespace<ChatRoom>;
+  ASSETS: Fetcher;
 }

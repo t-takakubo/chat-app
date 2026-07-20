@@ -1,8 +1,23 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // Cloudflare Pages project name — must match your existing Pages project.
   "name": "chat-app-web",
+  "main": "worker/src/index.ts",
   "compatibility_date": "2026-06-28",
-  // CSR/SPA static build output from `react-router build` (ssr: false).
-  "pages_build_output_dir": "./build/client",
+  // CSR/SPA static build output from `react-router build` (ssr: false), served
+  // via env.ASSETS from the fetch handler below, alongside the /match and
+  // /room/* API routes. run_worker_first is required so /match and /room/*
+  // reach the Worker instead of being swallowed by the SPA fallback.
+  "assets": {
+    "directory": "./build/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true,
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "MATCH_QUEUE", "class_name": "MatchQueue" },
+      { "name": "CHAT_ROOM", "class_name": "ChatRoom" },
+    ],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MatchQueue", "ChatRoom"] }],
 }
