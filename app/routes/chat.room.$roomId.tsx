@@ -1,6 +1,8 @@
-import { useParams } from "react-router";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import { cn } from "~/lib/utils";
-import { ChatBackLink } from "~/components/chat-back-link";
+import { EndChatDialog } from "~/components/end-chat-dialog";
+import { PeerLeftDialog } from "~/components/peer-left-dialog";
 import { ThemeToggle } from "~/components/theme-toggle";
 import {
   MessageScroller,
@@ -18,8 +20,8 @@ import {
   MessageHeader,
 } from "~/components/ui/message";
 import { Bubble, BubbleContent } from "~/components/ui/bubble";
-import { Marker, MarkerContent } from "~/components/ui/marker";
 import { ChatComposer } from "~/components/chat-composer";
+import { MatchedIntro } from "~/components/matched-intro";
 import { useChatRoom } from "~/lib/use-chat-room";
 import { SITE_NAME } from "~/lib/seo";
 import type { Route } from "./+types/chat.room.$roomId";
@@ -36,18 +38,26 @@ function formatTime(timestamp: number) {
 
 export default function ChatRoomLive() {
   const { roomId } = useParams();
-  const { messages, peerOnline, peerName, send, userId } = useChatRoom(roomId ?? "");
+  const navigate = useNavigate();
+  const [peerLeftDialogOpen, setPeerLeftDialogOpen] = useState(false);
+
+  const { messages, peerOnline, peerName, send, leave, userId } = useChatRoom(roomId ?? "", () =>
+    setPeerLeftDialogOpen(true),
+  );
+
+  const handleEnd = () => {
+    leave();
+    void navigate("/");
+  };
+
+  const handlePeerLeftAcknowledge = () => {
+    void navigate("/");
+  };
 
   return (
     <div className="flex h-dvh flex-col bg-background text-foreground">
       {/* Header */}
       <div className="flex shrink-0 items-center gap-3 border-b border-border bg-background/90 px-4 py-3.5 backdrop-blur-lg">
-        <ChatBackLink to="/" />
-
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-chat-avatar text-sm font-bold text-white shadow-sm">
-          {(peerName ?? "?")[0]}
-        </div>
-
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold text-sm tracking-[-0.01em] leading-none">
             {peerName ?? "相手を待っています…"}
@@ -63,6 +73,7 @@ export default function ChatRoomLive() {
           </p>
         </div>
 
+        <EndChatDialog onConfirm={handleEnd} />
         <ThemeToggle />
       </div>
 
@@ -74,9 +85,7 @@ export default function ChatRoomLive() {
               <MessageScrollerContent className="mx-auto max-w-2xl gap-4 px-4 py-6">
                 {messages.length === 0 && (
                   <MessageScrollerItem>
-                    <Marker variant="separator">
-                      <MarkerContent>マッチしました</MarkerContent>
-                    </Marker>
+                    <MatchedIntro peerName={peerName} />
                   </MessageScrollerItem>
                 )}
 
@@ -128,6 +137,12 @@ export default function ChatRoomLive() {
       </div>
 
       <ChatComposer onSend={send} />
+
+      <PeerLeftDialog
+        open={peerLeftDialogOpen}
+        peerName={peerName}
+        onAcknowledge={handlePeerLeftAcknowledge}
+      />
     </div>
   );
 }

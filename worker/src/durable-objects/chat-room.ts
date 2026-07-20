@@ -12,6 +12,8 @@ type MessageRow = {
   created_at: number;
 };
 
+type MemberAttachment = Identity & { visible: boolean };
+
 const MEMBER_TAG = "member";
 const MAX_MEMBERS = 2;
 const MAX_BODY_LENGTH = 2000;
@@ -72,7 +74,7 @@ export class ChatRoom extends DurableObject<Env> {
     const [client, server] = Object.values(pair);
 
     this.ctx.acceptWebSocket(server, [MEMBER_TAG]);
-    server.serializeAttachment({ userId, name } satisfies Identity);
+    server.serializeAttachment({ userId, name, visible: true } satisfies MemberAttachment);
 
     const history = this.ctx.storage.sql
       .exec<MessageRow>(
@@ -80,10 +82,15 @@ export class ChatRoom extends DurableObject<Env> {
         HISTORY_LIMIT,
       )
       .toArray();
-    const peerNames = existingMembers.map(
-      (member) => (member.deserializeAttachment() as Identity).name,
+    const peerAttachments = existingMembers.map(
+      (member) => member.deserializeAttachment() as MemberAttachment,
     );
-    this.send(server, { type: "history", messages: history.map(rowToMessage), peerNames });
+    this.send(server, {
+      type: "history",
+      messages: history.map(rowToMessage),
+      peerNames: peerAttachments.map((a) => a.name),
+      peerVisible: peerAttachments.map((a) => a.visible),
+    });
 
     for (const member of existingMembers) {
       this.send(member, { type: "peer-joined", name });
@@ -101,12 +108,21 @@ export class ChatRoom extends DurableObject<Env> {
     } catch {
       return;
     }
+    if (event.type === "presence") {
+      const attachment = ws.deserializeAttachment() as MemberAttachment;
+      ws.serializeAttachment({ ...attachment, visible: event.visible } satisfies MemberAttachment);
+      for (const member of this.ctx.getWebSockets(MEMBER_TAG)) {
+        if (member === ws) continue;
+        this.send(member, { type: "peer-presence", visible: event.visible });
+      }
+      return;
+    }
     if (event.type !== "message") return;
 
     const body = event.body.trim().slice(0, MAX_BODY_LENGTH);
     if (!body) return;
 
-    const identity = ws.deserializeAttachment() as Identity;
+    const identity = ws.deserializeAttachment() as MemberAttachment;
     const createdAt = Date.now();
     const row = this.ctx.storage.sql
       .exec<MessageRow>(
