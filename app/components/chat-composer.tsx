@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { cn } from "~/lib/utils";
+import { SendHorizontal } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
 
 export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
   const [input, setInput] = useState("");
@@ -18,52 +20,29 @@ export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
     }
   };
 
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
-    const el = e.target;
-    el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
-  };
-
   return (
-    <div className="px-4 pb-6 pt-3 flex-shrink-0 border-t border-white/[0.05]">
-      <div
-        className={cn(
-          "flex items-end gap-3 max-w-2xl mx-auto rounded-2xl px-4 py-3 transition-all duration-200 bg-white/[0.04] border",
-          input ? "border-primary/20" : "border-white/[0.07]",
-        )}
-      >
-        <textarea
+    <div className="shrink-0 border-t border-border bg-background px-4 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+      <div className="mx-auto flex max-w-2xl items-end gap-2 rounded-2xl border-2 border-input bg-card px-3 py-2 shadow-xs transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
+        <Textarea
           value={input}
-          onChange={handleInput}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="メッセージを入力..."
+          placeholder="メッセージを入力…"
           rows={1}
-          className="flex-1 resize-none outline-none bg-transparent text-sm leading-relaxed placeholder:opacity-30 min-h-6 max-h-[120px]"
+          aria-label="メッセージ"
+          className="max-h-30 min-h-6 flex-1 resize-none overflow-y-auto rounded-none border-0 bg-transparent p-1.5 text-foreground leading-relaxed placeholder:text-muted-foreground focus-visible:border-transparent focus-visible:ring-0 dark:bg-transparent"
         />
-        <button
+        <Button
+          size="icon-lg"
           onClick={send}
           disabled={!input.trim()}
-          className={cn(
-            "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 active:scale-95 disabled:cursor-not-allowed",
-            input.trim()
-              ? "bg-linear-to-br from-chat-primary-from to-primary text-primary-foreground shadow-[0_2px_12px_color-mix(in_oklch,var(--primary)_30%,transparent)]"
-              : "bg-white/[0.06] text-chat-subtle",
-          )}
+          aria-label="送信"
+          className="rounded-xl bg-linear-to-br from-chat-primary-from to-primary shadow-[0_2px_12px_color-mix(in_oklch,var(--primary)_30%,transparent)] hover:opacity-90 disabled:shadow-none"
         >
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-          >
-            <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" />
-          </svg>
-        </button>
+          <SendHorizontal />
+        </Button>
       </div>
-      <p className="text-center text-[11px] mt-2 text-chat-ghost">
+      <p className="mt-2 text-center text-[11px] text-muted-foreground">
         Enter で送信 · Shift+Enter で改行
       </p>
     </div>
