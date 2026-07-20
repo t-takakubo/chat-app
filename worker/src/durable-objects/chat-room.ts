@@ -1,8 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
 import type { Env } from "../env";
 import type { ChatMessage, RoomClientEvent, RoomServerEvent } from "../../../shared/match-protocol";
-
-type Identity = { userId: string; name: string };
+import type { Identity } from "../../../shared/identity";
+import { insertMessage, recordRoomCreated } from "../db";
 
 type MessageRow = {
   id: number;
@@ -44,9 +44,7 @@ export class ChatRoom extends DurableObject<Env> {
         )
       `);
       try {
-        await this.env.DB.prepare("INSERT OR IGNORE INTO rooms (room_id, created_at) VALUES (?, ?)")
-          .bind(this.roomId, Date.now())
-          .run();
+        await recordRoomCreated(this.env.DB, this.roomId, Date.now());
       } catch (err) {
         console.error("Failed to record room in D1", err);
       }
@@ -123,11 +121,13 @@ export class ChatRoom extends DurableObject<Env> {
     const chatMessage = rowToMessage(row);
 
     try {
-      await this.env.DB.prepare(
-        "INSERT INTO messages (room_id, author_id, author_name, body, created_at) VALUES (?, ?, ?, ?, ?)",
-      )
-        .bind(this.roomId, identity.userId, identity.name, body, createdAt)
-        .run();
+      await insertMessage(this.env.DB, {
+        roomId: this.roomId,
+        authorId: identity.userId,
+        authorName: identity.name,
+        body,
+        createdAt,
+      });
     } catch (err) {
       console.error("Failed to persist message to D1", err);
     }

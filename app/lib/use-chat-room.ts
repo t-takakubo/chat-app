@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChatMessage, RoomClientEvent, RoomServerEvent } from "../../shared/match-protocol";
 import { matchWsUrl } from "./match-config";
 import { getIdentity } from "./session";
+import { useJsonWebSocket } from "./use-json-websocket";
 
 export type RoomStatus = "connecting" | "open" | "closed";
 
@@ -11,24 +12,15 @@ export function useChatRoom(roomId: string) {
   const [peerName, setPeerName] = useState<string | null>(null);
   const [status, setStatus] = useState<RoomStatus>("connecting");
   const [identity] = useState(() => getIdentity());
-  const wsRef = useRef<WebSocket | null>(null);
 
-  useEffect(() => {
-    const url = matchWsUrl(
-      `/room/${roomId}?userId=${encodeURIComponent(identity.userId)}&name=${encodeURIComponent(identity.name)}`,
-    );
-    const ws = new WebSocket(url);
-    wsRef.current = ws;
-    setMessages([]);
-    setPeerOnline(false);
-    setPeerName(null);
-    setStatus("connecting");
-
-    ws.onopen = () => setStatus("open");
-    ws.onclose = () => setStatus("closed");
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data as string) as RoomServerEvent;
+  const {
+    connect,
+    disconnect,
+    send: sendJson,
+  } = useJsonWebSocket<RoomServerEvent>({
+    onOpen: () => setStatus("open"),
+    onClose: () => setStatus("closed"),
+    onMessage: (data) => {
       switch (data.type) {
         case "history":
           setMessages(data.messages);
@@ -48,19 +40,27 @@ export function useChatRoom(roomId: string) {
           setPeerOnline(false);
           break;
       }
-    };
+    },
+  });
 
-    return () => {
-      ws.close(1000, "unmount");
-      wsRef.current = null;
-    };
-  }, [roomId]);
+  useEffect(() => {
+    const url = matchWsUrl(
+      `/room/${roomId}?userId=${encodeURIComponent(identity.userId)}&name=${encodeURIComponent(identity.name)}`,
+    );
+    setMessages([]);
+    setPeerOnline(false);
+    setPeerName(null);
+    setStatus("connecting");
+    connect(url);
+
+    return () => disconnect(1000, "unmount");
+  }, [roomId, identity, connect, disconnect]);
 
   const send = (body: string) => {
     const trimmed = body.trim();
-    if (!trimmed || wsRef.current?.readyState !== WebSocket.OPEN) return;
+    if (!trimmed) return;
     const event: RoomClientEvent = { type: "message", body: trimmed };
-    wsRef.current.send(JSON.stringify(event));
+    sendJson(event);
   };
 
   return { messages, peerOnline, peerName, status, send, userId: identity.userId };

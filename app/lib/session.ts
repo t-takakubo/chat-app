@@ -1,6 +1,6 @@
-const STORAGE_KEY = "chat-app-web:identity";
+import type { Identity } from "../../shared/identity";
 
-export type Identity = { userId: string; name: string };
+const STORAGE_KEY = "chat-app-web:identity";
 
 function randomName(): string {
   return `ゲスト${Math.floor(1000 + Math.random() * 9000)}`;

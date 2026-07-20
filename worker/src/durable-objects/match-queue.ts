@@ -1,8 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import type { Env } from "../env";
 import type { QueueServerEvent } from "../../../shared/match-protocol";
-
-type Identity = { userId: string; name: string };
+import type { Identity } from "../../../shared/identity";
 
 const WAITING_TAG = "waiting";
 
