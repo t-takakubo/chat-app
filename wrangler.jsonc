@@ -24,4 +24,12 @@
     ],
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MatchQueue", "ChatRoom"] }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chat-app-web-db",
+      "database_id": "e28ea645-48bb-4149-9d5f-6a16388c9243",
+      "migrations_dir": "worker/migrations",
+    },
+  ],
 }

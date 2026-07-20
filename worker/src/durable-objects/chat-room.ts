@@ -28,8 +28,11 @@ function rowToMessage(row: MessageRow): ChatMessage {
 }
 
 export class ChatRoom extends DurableObject<Env> {
+  private readonly roomId: string;
+
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.roomId = ctx.id.name ?? ctx.id.toString();
     void ctx.blockConcurrencyWhile(async () => {
       this.ctx.storage.sql.exec(`
         CREATE TABLE IF NOT EXISTS messages (
@@ -40,6 +43,13 @@ export class ChatRoom extends DurableObject<Env> {
           created_at INTEGER NOT NULL
         )
       `);
+      try {
+        await this.env.DB.prepare("INSERT OR IGNORE INTO rooms (room_id, created_at) VALUES (?, ?)")
+          .bind(this.roomId, Date.now())
+          .run();
+      } catch (err) {
+        console.error("Failed to record room in D1", err);
+      }
     });
   }
 
@@ -111,6 +121,17 @@ export class ChatRoom extends DurableObject<Env> {
       .one();
 
     const chatMessage = rowToMessage(row);
+
+    try {
+      await this.env.DB.prepare(
+        "INSERT INTO messages (room_id, author_id, author_name, body, created_at) VALUES (?, ?, ?, ?, ?)",
+      )
+        .bind(this.roomId, identity.userId, identity.name, body, createdAt)
+        .run();
+    } catch (err) {
+      console.error("Failed to persist message to D1", err);
+    }
+
     for (const member of this.ctx.getWebSockets(MEMBER_TAG)) {
       this.send(member, { type: "message", message: chatMessage });
     }
