@@ -102,7 +102,13 @@ function PersonIcon({
 export default function Chat() {
   const navigate = useNavigate();
   const { status, elapsed, result, start, cancel } = useMatchQueue();
-  const [name, setName] = useState(() => getIdentity().name);
+  // プリレンダーHTML(空文字・disabled)と初回レンダーを一致させるため、
+  // localStorageの読み込みはhydration後のeffectで行う
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    setName(getIdentity().name);
+  }, []);
 
   const handleNameChange = (value: string) => {
     setName(value);
