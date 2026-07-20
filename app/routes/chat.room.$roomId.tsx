@@ -21,6 +21,14 @@ import { Bubble, BubbleContent } from "~/components/ui/bubble";
 import { Marker, MarkerContent } from "~/components/ui/marker";
 import { ChatComposer } from "~/components/chat-composer";
 import { useChatRoom } from "~/lib/use-chat-room";
+import { SITE_NAME } from "~/lib/seo";
+import type { Route } from "./+types/chat.room.$roomId";
+
+// Rooms are private, one-off conversations — keep them out of search indexes.
+export const meta: Route.MetaFunction = () => [
+  { title: `チャットルーム | ${SITE_NAME}` },
+  { name: "robots", content: "noindex, nofollow" },
+];
 
 function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /chat/room/
+
+Sitemap: https://chat.quickformats.com/sitemap.xml

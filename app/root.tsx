@@ -11,9 +11,25 @@ import {
 import { Button } from "~/components/ui/button";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { TooltipProvider } from "~/components/ui/tooltip";
+import { SITE_DESCRIPTION, SITE_NAME } from "~/lib/seo";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+
+export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+  { rel: "icon", type: "image/svg+xml", href: "/icon.svg" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { rel: "manifest", href: "/manifest.webmanifest" },
+];
+
+// Fallback meta: real routes define their own, so this only reaches
+// 404 / error pages — keep those out of search indexes.
+export const meta: Route.MetaFunction = () => [
+  { title: SITE_NAME },
+  { name: "description", content: SITE_DESCRIPTION },
+  { name: "robots", content: "noindex" },
+];
 
 // Applies the saved (or system) theme before first paint to avoid a flash.
 const themeInitScript = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d);}catch(e){}})();`;
@@ -24,6 +40,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf7f2" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1917" />
         <Meta />
         <Links />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

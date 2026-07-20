@@ -7,6 +7,52 @@ import { ThemeToggle } from "~/components/theme-toggle";
 import { cn } from "~/lib/utils";
 import { useMatchQueue } from "~/lib/use-match-queue";
 import { getIdentity, setDisplayName } from "~/lib/session";
+import { OG_IMAGE_URL, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "~/lib/seo";
+import type { Route } from "./+types/chat";
+
+export const meta: Route.MetaFunction = () => [
+  { title: SITE_TITLE },
+  { name: "description", content: SITE_DESCRIPTION },
+  { tagName: "link", rel: "canonical", href: `${SITE_URL}/` },
+  { property: "og:type", content: "website" },
+  { property: "og:site_name", content: SITE_NAME },
+  { property: "og:locale", content: "ja_JP" },
+  { property: "og:url", content: `${SITE_URL}/` },
+  { property: "og:title", content: SITE_TITLE },
+  { property: "og:description", content: SITE_DESCRIPTION },
+  { property: "og:image", content: OG_IMAGE_URL },
+  { property: "og:image:width", content: "1200" },
+  { property: "og:image:height", content: "630" },
+  { property: "og:image:alt", content: `${SITE_NAME} — 登録不要のランダムチャット` },
+  { name: "twitter:card", content: "summary_large_image" },
+  { name: "twitter:title", content: SITE_TITLE },
+  { name: "twitter:description", content: SITE_DESCRIPTION },
+  { name: "twitter:image", content: OG_IMAGE_URL },
+  {
+    "script:ld+json": [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        inLanguage: "ja",
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        description: SITE_DESCRIPTION,
+        applicationCategory: "CommunicationApplication",
+        operatingSystem: "Any",
+        browserRequirements: "Requires JavaScript.",
+        inLanguage: "ja",
+        isAccessibleForFree: true,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "JPY" },
+      },
+    ],
+  },
+];
 
 const ambientDots = [
   { radius: 92, duration: 7 },
