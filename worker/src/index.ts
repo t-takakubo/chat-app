@@ -1,4 +1,5 @@
 import type { Env } from "./env";
+import { handleAdminRequest } from "./admin";
 
 export { MatchQueue } from "./durable-objects/match-queue";
 export { ChatRoom } from "./durable-objects/chat-room";
@@ -6,6 +7,10 @@ export { ChatRoom } from "./durable-objects/chat-room";
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) {
+      return handleAdminRequest(request, env, url);
+    }
 
     if (url.pathname === "/match") {
       const stub = env.MATCH_QUEUE.getByName("global");
