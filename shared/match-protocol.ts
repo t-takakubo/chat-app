@@ -13,8 +13,10 @@ export type RoomServerEvent =
   | { type: "message"; message: ChatMessage }
   | { type: "peer-joined"; name: string }
   | { type: "peer-left" }
-  | { type: "peer-presence"; visible: boolean };
+  | { type: "peer-presence"; visible: boolean }
+  | { type: "peer-typing"; isTyping: boolean };
 
 export type RoomClientEvent =
   | { type: "message"; body: string }
-  | { type: "presence"; visible: boolean };
+  | { type: "presence"; visible: boolean }
+  | { type: "typing"; isTyping: boolean };
