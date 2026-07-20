@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 import { cn } from "~/lib/utils";
 import { ChatBackLink } from "~/components/chat-back-link";
+import { ThemeToggle } from "~/components/theme-toggle";
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -30,37 +31,39 @@ export default function ChatRoomLive() {
   const { messages, peerOnline, peerName, send, userId } = useChatRoom(roomId ?? "");
 
   return (
-    <div className="chat-theme bg-background text-foreground flex flex-col h-screen">
+    <div className="flex h-dvh flex-col bg-background text-foreground">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3.5 flex-shrink-0 border-b border-border bg-background/90 backdrop-blur-lg">
-        <ChatBackLink to="/chat" />
+      <div className="flex shrink-0 items-center gap-3 border-b border-border bg-background/90 px-4 py-3.5 backdrop-blur-lg">
+        <ChatBackLink to="/" />
 
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0 bg-chat-avatar">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-chat-avatar text-sm font-bold text-white shadow-sm">
           {(peerName ?? "?")[0]}
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <h2 className="font-semibold text-sm tracking-[-0.01em] leading-none">
             {peerName ?? "相手を待っています…"}
           </h2>
-          <p className="text-xs mt-1 flex items-center gap-1.5 text-chat-faint">
+          <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <span
               className={cn(
-                "inline-block w-1.5 h-1.5 rounded-full",
-                peerOnline ? "bg-chat-status-online" : "bg-chat-faint",
+                "inline-block h-1.5 w-1.5 rounded-full",
+                peerOnline ? "bg-chat-status-online" : "bg-muted-foreground/40",
               )}
             />
             {peerOnline ? "オンライン" : "オフライン"}
           </p>
         </div>
+
+        <ThemeToggle />
       </div>
 
       {/* Message area */}
-      <div className="flex-1 min-h-0">
+      <div className="min-h-0 flex-1">
         <MessageScrollerProvider>
           <MessageScroller>
             <MessageScrollerViewport>
-              <MessageScrollerContent className="py-6 gap-4 max-w-2xl mx-auto px-4">
+              <MessageScrollerContent className="mx-auto max-w-2xl gap-4 px-4 py-6">
                 {messages.length === 0 && (
                   <MessageScrollerItem>
                     <Marker variant="separator">
@@ -83,13 +86,13 @@ export default function ChatRoomLive() {
                     >
                       <Message align={isMe ? "end" : "start"}>
                         {!isMe && (
-                          <MessageAvatar>
+                          <MessageAvatar className={isGroupStart ? "" : "bg-transparent"}>
                             {isGroupStart ? (
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow bg-chat-avatar">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-chat-avatar text-xs font-semibold text-white shadow-sm">
                                 {msg.authorName[0]}
                               </div>
                             ) : (
-                              <div className="w-8 h-8" />
+                              <div className="h-8 w-8" />
                             )}
                           </MessageAvatar>
                         )}
