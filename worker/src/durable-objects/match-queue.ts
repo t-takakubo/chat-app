@@ -2,6 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import type { Env } from "../env";
 import type { QueueServerEvent } from "../../../shared/match-protocol";
 import type { Identity } from "../../../shared/identity";
+import { notifyDiscord } from "../discord";
 
 const WAITING_TAG = "waiting";
 
@@ -23,6 +24,12 @@ export class MatchQueue extends DurableObject<Env> {
 
     this.ctx.acceptWebSocket(server, [WAITING_TAG]);
     server.serializeAttachment({ userId, name } satisfies Identity);
+    this.ctx.waitUntil(
+      notifyDiscord(
+        this.env,
+        `🔍 **${name}** がマッチング待機を開始しました\n<https://chat.quickformats.com>`,
+      ),
+    );
 
     this.tryPair();
 
