@@ -14,7 +14,9 @@ export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    // IME変換確定のEnterを送信として扱わないよう isComposing をチェックする。
+    // Safari は compositionend 後も isComposing が残る場合があるため keyCode 229 も見る。
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
       e.preventDefault();
       send();
     }
@@ -42,7 +44,7 @@ export function ChatComposer({ onSend }: { onSend: (text: string) => void }) {
           <SendHorizontal />
         </Button>
       </div>
-      <p className="mt-2 text-center text-[11px] text-muted-foreground">
+      <p className="mt-2 hidden text-center text-[11px] text-muted-foreground sm:block">
         Enter で送信 · Shift+Enter で改行
       </p>
     </div>
