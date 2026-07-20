@@ -1,5 +1,5 @@
 import type { Env } from "./env";
-import { handleAdminRequest } from "./admin";
+import { handleAdminRequest } from "./admin/router";
 
 export { MatchQueue } from "./durable-objects/match-queue";
 export { ChatRoom } from "./durable-objects/chat-room";

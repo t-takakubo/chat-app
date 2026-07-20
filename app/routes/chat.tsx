@@ -4,7 +4,9 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { ThemeToggle } from "~/components/theme-toggle";
+import { PersonIcon } from "~/components/person-icon";
 import { cn } from "~/lib/utils";
+import { formatElapsed } from "~/lib/format";
 import { useMatchQueue } from "~/lib/use-match-queue";
 import { getIdentity, setDisplayName } from "~/lib/session";
 import { OG_IMAGE_URL, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "~/lib/seo";
@@ -65,39 +67,6 @@ const ambientDots = [
     "--chat-dot-radius": `${dot.radius}px`,
   } as CSSProperties,
 }));
-
-function formatElapsed(seconds: number) {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-function PersonIcon({
-  size,
-  strokeWidth,
-  opacity,
-  className,
-}: {
-  size: number;
-  strokeWidth: number;
-  opacity: number;
-  className?: string;
-}) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      className={className}
-    >
-      <circle cx="12" cy="12" r="3" />
-      <circle cx="12" cy="12" r="8" opacity={opacity} />
-    </svg>
-  );
-}
 
 export default function Chat() {
   const navigate = useNavigate();
